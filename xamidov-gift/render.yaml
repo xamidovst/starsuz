@@ -1,0 +1,62 @@
+# Render Blueprint — XAMIDOV GIFT
+# https://render.com → New + → Blueprint → GitHub repodan
+#
+# MUHIM TANLOV:
+#  A) BEPUL (hozirgi holat): Web Service (free) + MODE=web.
+#     Bot polling + health server birga ishlaydi.
+#     Agar 15 daqiqada hech kim qaramasa — xizmat uyquga tushadi,
+#     shuning uchun UptimeRobot (bepul) bilan /health sahifasini
+#     10 daqiqada bir ping qiling.
+#
+#  B) PUL (tavsiya etiladi, 24/7): quyidagi `type: worker` qatorini
+#     yoqing va disk qo'shing — bot hech qachon uxlamaydi va
+#     ma'lumotlar bazasi saqlanib qoladi.
+
+services:
+  - type: web
+    name: xamidov-gift
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    healthCheckPath: /health
+    envVars:
+      - key: MODE
+        value: web
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      # --- quyidagi 3 tasini Render dashboard'da qo'lda kiriting (sync: false) ---
+      - key: BOT_TOKEN
+        sync: false
+      - key: BOT_USERNAME
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+
+# ---------------------------------------------------------------------------
+# (B) PUL REJIM — Background Worker + Disk (24/7 ishlaydi):
+#
+# services:
+#   - type: worker
+#     name: xamidov-gift
+#     runtime: python
+#     buildCommand: pip install -r requirements.txt
+#     startCommand: python bot.py
+#     envVars:
+#       - key: MODE
+#         value: worker
+#       - key: PYTHON_VERSION
+#         value: 3.12.7
+#       - key: BOT_TOKEN
+#         sync: false
+#       - key: BOT_USERNAME
+#         sync: false
+#       - key: ADMIN_IDS
+#         sync: false
+#       - key: DB_PATH
+#         value: /data/xamidov_gift.db
+#     disk:
+#       name: xamidov-data
+#       mountPath: /data
+#       sizeGB: 1
+# ---------------------------------------------------------------------------
